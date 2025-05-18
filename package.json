@@ -1,0 +1,30 @@
+{
+  "name": "filenest-landing",
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "npm install",
+    "deploy": "az webapp up --runtime NODE:18-lts --sku B1 --name filenest-landing --resource-group RG-FileNest-App --location eastus"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "20": "^1.0.0",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "mssql": "^11.0.1",
+    "mysql2": "^3.14.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "nodemon": "^3.1.10",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.1"
+  },
+  "description": ""
+}
