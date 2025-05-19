@@ -12,14 +12,17 @@ document.getElementById('emailForm').addEventListener('submit', async (e) => {
             body: JSON.stringify({ email })
         });
         
+        const data = await response.json();
+        
         if (response.ok) {
             alert('Thank you for subscribing!');
             document.getElementById('emailForm').reset();
         } else {
-            alert('Something went wrong. Please try again.');
+            console.error('Server error:', data);
+            alert(`Error: ${data.error || 'Something went wrong'}`);
         }
     } catch (error) {
-        console.error('Error:', error);
-        alert('Something went wrong. Please try again.');
+        console.error('Client error:', error);
+        alert('Connection error. Please try again.');
     }
 });
