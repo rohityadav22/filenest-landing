@@ -90,38 +90,63 @@ async function startServer() {
 
 app.post('/api/subscribe', async (req, res) => {
     try {
+        console.log('Subscribe endpoint hit');
+        console.log('Request body:', req.body);
+        
         const { email } = req.body;
         
         if (!email) {
+            console.log('Email missing in request');
             return res.status(400).json({ error: 'Email is required' });
+        }
+
+        if (!pool) {
+            console.error('Database pool not initialized');
+            return res.status(500).json({ error: 'Database connection not available' });
         }
 
         // Create a new request with the pool
         const request = pool.request()
             .input('email', sql.NVarChar, email);
         
-        // Log the attempt
+        console.log('Database request created');
         console.log(`Attempting to insert email: ${email}`);
+
+        // Log database config (without sensitive info)
+        console.log('Database config:', {
+            server: config.server,
+            database: config.database,
+            encrypt: config.options.encrypt
+        });
 
         // Check if email already exists
         const checkResult = await request
             .query('SELECT COUNT(*) as count FROM subscribers WHERE email = @email');
+        
+        console.log('Check result:', checkResult);
 
         if (checkResult.recordset[0].count > 0) {
+            console.log(`Email ${email} already exists`);
             return res.status(409).json({ error: 'Email already exists' });
         }
 
-        // Insert new subscriber using the same request (reusing the email parameter)
-        await request
+        // Insert new subscriber
+        const insertResult = await request
             .query(`
                 INSERT INTO subscribers (email) 
                 VALUES (@email)
             `);
-
+        
+        console.log('Insert result:', insertResult);
         console.log(`Successfully inserted email: ${email}`);
         res.status(200).json({ message: 'Subscription successful' });
     } catch (error) {
-        console.error('Database error:', error);
+        console.error('Detailed error:', {
+            message: error.message,
+            stack: error.stack,
+            code: error.code,
+            state: error.state
+        });
         res.status(500).json({ error: 'Failed to save subscription' });
     }
 });
